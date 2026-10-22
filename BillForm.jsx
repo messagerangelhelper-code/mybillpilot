@@ -27,7 +27,7 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
     if (form.category === "other" && !otherType) return setError("Pick what type of bill this is, or type your own.");
     let payUrl = form.payUrl.trim();
     if (payUrl && !/^https?:\/\//i.test(payUrl)) payUrl = "https://" + payUrl;
-    onSave({ ...form, name: form.name.trim(), amount: Number(form.amount), payUrl, otherType, snoozedUntil: null });
+    onSave({ ...form, name: form.name.trim(), amount: Number(form.amount), payUrl, otherType, autopay: !!form.autopay, snoozedUntil: null });
   }
 
   return (
@@ -91,6 +91,14 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
         <span>Payment website (optional)</span>
         <input type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" value={form.payUrl} onChange={(e) => set("payUrl", e.target.value)} placeholder="The company's real payment page" />
         <small>Copy it from your bill or the company's official site — not from a text or email link. ScamShield checks it every time you pay.</small>
+      </label>
+
+      <label className="check-field">
+        <input type="checkbox" checked={!!form.autopay} onChange={(e) => set("autopay", e.target.checked)} />
+        <span>
+          <strong>Autopay is on with this company</strong>
+          <small>Turn on autopay on the company's website first. MyBillPilot won't ask you to approve this bill — it gives you a heads-up before the charge and marks it paid on the due date.</small>
+        </span>
       </label>
 
       {error && <p className="error">{error}</p>}

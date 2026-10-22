@@ -133,6 +133,39 @@ export function nextDueAfterPayment(bill) {
 // A bill "needs you" when it's due within a week (or overdue) and not snoozed.
 export function needsApproval(bill) {
   if (!bill.nextDue) return false;
+  if (bill.autopay) return false; // the company charges it automatically
   if (bill.snoozedUntil && bill.snoozedUntil > todayISO()) return false;
   return daysUntil(bill.nextDue) <= 7;
+}
+
+// Autopay bills are charged by the company on the due date. When the app opens,
+// record any that have come due as paid and roll them forward.
+export function settleAutopay(data) {
+  const today = todayISO();
+  let changed = false;
+  const payments = [...data.payments];
+  const bills = [];
+  for (const bill of data.bills) {
+    let b = bill;
+    let guard = 0;
+    while (b && b.autopay && b.nextDue && b.nextDue <= today && guard < 24) {
+      payments.push({
+        id: newId(), billId: b.id, name: b.name, category: b.category,
+        amount: Number(b.amount) || 0, date: b.nextDue, autopay: true,
+      });
+      const next = nextDueAfterPayment(b);
+      b = next ? { ...b, nextDue: next } : null;
+      changed = true;
+      guard += 1;
+    }
+    if (b) bills.push(b);
+  }
+  return changed ? { ...data, bills, payments } : data;
+}
+
+// Autopay bills charging within the next few days (for a heads-up on Home).
+export function upcomingAutopay(bills, days = 3) {
+  return bills
+    .filter((b) => b.autopay && b.nextDue && daysUntil(b.nextDue) >= 0 && daysUntil(b.nextDue) <= days)
+    .sort((a, b) => (a.nextDue < b.nextDue ? -1 : 1));
 }

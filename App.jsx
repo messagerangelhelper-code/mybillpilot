@@ -9,7 +9,7 @@ import Kids from "./Kids.jsx";
 import Premium from "./Premium.jsx";
 import { checkPremium } from "./premium.js";
 import {
-  loadData, saveData, newId, todayISO, addDays, nextDueAfterPayment,
+  loadData, saveData, newId, settleAutopay, todayISO, addDays, nextDueAfterPayment,
   FREE_BILL_LIMIT, FREE_KID_LIMIT,
 } from "./storage.js";
 
@@ -21,7 +21,7 @@ const TABS = [
 ];
 
 export default function App() {
-  const [data, setData] = useState(loadData);
+  const [data, setData] = useState(() => settleAutopay(loadData()));
   const [tab, setTab] = useState("home");
   const [editing, setEditing] = useState(null); // null | "new" | bill
   const [approvingId, setApprovingId] = useState(null);

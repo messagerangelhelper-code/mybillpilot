@@ -54,6 +54,13 @@ export default function Approve({ bill, onBack, onPaid, onSnooze, onEdit }) {
         {host && <div className="muted small">Pays at {host}</div>}
       </section>
 
+      {bill.autopay && (
+        <section className="check-card muted-card">
+          <div className="check-head"><Icon name="card" /> On autopay</div>
+          <p>The company charges this automatically. MyBillPilot will mark it paid on the due date — nothing for you to do.</p>
+        </section>
+      )}
+
       {check.status === "loading" && (
         <section className="check-card"><div className="check-head"><Icon name="shield" /> Checking the payment page with ScamShield…</div></section>
       )}

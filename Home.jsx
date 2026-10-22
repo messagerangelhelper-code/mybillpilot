@@ -1,6 +1,6 @@
 import Icon from "./icons.jsx";
 import {
-  CATEGORIES, money, dueText, needsApproval, sameMonth, todayISO,
+  CATEGORIES, money, dueText, needsApproval, sameMonth, todayISO, upcomingAutopay, fromISO, daysUntil,
 } from "./storage.js";
 
 export default function Home({ data, onApprove, onAdd, onSeeAll, onPremium }) {
@@ -17,6 +17,14 @@ export default function Home({ data, onApprove, onAdd, onSeeAll, onPremium }) {
   const waiting = data.bills
     .filter(needsApproval)
     .sort((a, b) => (a.nextDue < b.nextDue ? -1 : 1));
+
+  const autopaySoon = upcomingAutopay(data.bills);
+  const whenText = (iso) => {
+    const n = daysUntil(iso);
+    if (n === 0) return "today";
+    if (n === 1) return "tomorrow";
+    return fromISO(iso).toLocaleDateString(undefined, { weekday: "long" });
+  };
 
   const byCategory = CATEGORIES.map((c) => {
     const bills = data.bills.filter((b) => b.category === c.id);
@@ -67,6 +75,16 @@ export default function Home({ data, onApprove, onAdd, onSeeAll, onPremium }) {
           </span>
           <Icon name="chevron" size={18} />
         </button>
+      ))}
+
+      {autopaySoon.map((b) => (
+        <div key={b.id} className="info-row">
+          <span className="info-icon"><Icon name={b.category} size={20} /></span>
+          <span className="alert-text">
+            <strong>{b.name} — {money(b.amount)}</strong>
+            <span>Autopay charges {whenText(b.nextDue)}. Make sure the money is there.</span>
+          </span>
+        </div>
       ))}
 
       {byCategory.length > 0 && (

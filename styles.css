@@ -228,3 +228,14 @@ p { margin: 0; line-height: 1.5; }
 .plan-per { font-size: 13px; color: var(--muted); }
 .plan-tag { position: absolute; top: -11px; background: var(--amber); color: var(--ink); font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
 .notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+
+/* ---------- autopay ---------- */
+.check-field { display: flex; gap: 12px; align-items: flex-start; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 14px; cursor: pointer; }
+.check-field input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--sky); flex: none; }
+.check-field span { display: flex; flex-direction: column; gap: 4px; }
+.check-field strong { font-size: 15px; }
+.check-field small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.tag { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 999px; background: var(--sky-soft); color: var(--sky); vertical-align: middle; }
+.info-row { display: flex; align-items: center; gap: 12px; background: var(--sky-soft); border: 1px solid #c9dbef; border-radius: 16px; padding: 14px 16px; }
+.info-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--white); color: var(--sky); display: flex; align-items: center; justify-content: center; }
+.info-row .alert-text span { color: var(--muted); }

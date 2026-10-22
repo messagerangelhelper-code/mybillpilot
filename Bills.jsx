@@ -27,8 +27,8 @@ export default function Bills({ data, onOpen, onAdd }) {
               <button type="button" className="list-row" onClick={() => onOpen(b.id)}>
                 <span className="list-icon"><Icon name={b.category} size={20} /></span>
                 <span className="list-text">
-                  <strong>{b.name}</strong>
-                  <span>{billTypeLabel(b)} · {dueText(b.nextDue)}</span>
+                  <strong>{b.name}{b.autopay && <span className="tag">Autopay</span>}</strong>
+                  <span>{billTypeLabel(b)} · {b.autopay ? dueText(b.nextDue).replace(/^Due/, "Charges") : dueText(b.nextDue)}</span>
                 </span>
                 <span className="list-amount">{money(b.amount)}</span>
               </button>
@@ -46,7 +46,7 @@ export default function Bills({ data, onOpen, onAdd }) {
                 <span className="list-icon paid"><Icon name={p.category} size={20} /></span>
                 <span className="list-text">
                   <strong>{p.name}</strong>
-                  <span>Paid {new Date(p.date + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+                  <span>{p.autopay ? "Autopay" : "Paid"} {new Date(p.date + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
                 </span>
                 <span className="list-amount">{money(p.amount)}</span>
               </li>
