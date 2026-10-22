@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "./icons.jsx";
+import ScanBill from "./ScanBill.jsx";
 import { CATEGORIES, OTHER_TYPES, todayISO } from "./storage.js";
 
 export default function BillForm({ bill, onSave, onCancel, onDelete }) {
@@ -11,6 +12,19 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
     !bill?.otherType ? "" : OTHER_TYPES.includes(bill.otherType) ? bill.otherType : "custom"
   );
   const [error, setError] = useState("");
+  const [scanned, setScanned] = useState([]); // fields the scanner filled in
+
+  function applyScan({ fields }) {
+    setForm((f) => ({ ...f, ...fields }));
+    if (fields.category === "other") {
+      const t = fields.otherType || "";
+      setOtherChoice(!t ? "" : OTHER_TYPES.includes(t) ? t : "custom");
+    }
+    setScanned(Object.keys(fields));
+    setError("");
+  }
+
+  const fieldClass = (...keys) => (keys.some((k) => scanned.includes(k)) ? "field filled" : "field");
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -37,12 +51,14 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
         <h1>{bill ? "Edit bill" : "Add a bill"}</h1>
       </header>
 
-      <label className="field">
+      {!bill && <ScanBill onResult={applyScan} />}
+
+      <label className={fieldClass("name")}>
         <span>Name</span>
         <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Electric, Netflix, Car loan" maxLength={60} />
       </label>
 
-      <label className="field">
+      <label className={fieldClass("category")}>
         <span>Category</span>
         <select value={form.category} onChange={(e) => set("category", e.target.value)}>
           {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -67,7 +83,7 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
       )}
 
       <div className="two-col">
-        <label className="field">
+        <label className={fieldClass("amount")}>
           <span>Amount ($)</span>
           <input type="number" inputMode="decimal" min="0" step="0.01" value={form.amount} onChange={(e) => set("amount", e.target.value)} placeholder="0.00" />
         </label>
@@ -82,12 +98,12 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
         </label>
       </div>
 
-      <label className="field">
+      <label className={fieldClass("nextDue")}>
         <span>Next due date</span>
         <input type="date" value={form.nextDue} onChange={(e) => set("nextDue", e.target.value)} />
       </label>
 
-      <label className="field">
+      <label className={fieldClass("payUrl")}>
         <span>Payment website (optional)</span>
         <input type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" value={form.payUrl} onChange={(e) => set("payUrl", e.target.value)} placeholder="The company's real payment page" />
         <small>Copy it from your bill or the company's official site — not from a text or email link. ScamShield checks it every time you pay.</small>
