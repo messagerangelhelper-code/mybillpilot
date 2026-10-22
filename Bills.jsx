@@ -1,5 +1,5 @@
 import Icon from "./icons.jsx";
-import { categoryLabel, money, dueText, sameMonth } from "./storage.js";
+import { billTypeLabel, money, dueText, sameMonth } from "./storage.js";
 
 export default function Bills({ data, onOpen, onAdd }) {
   const bills = [...data.bills].sort((a, b) => (a.nextDue < b.nextDue ? -1 : 1));
@@ -28,7 +28,7 @@ export default function Bills({ data, onOpen, onAdd }) {
                 <span className="list-icon"><Icon name={b.category} size={20} /></span>
                 <span className="list-text">
                   <strong>{b.name}</strong>
-                  <span>{categoryLabel(b.category)} · {dueText(b.nextDue)}</span>
+                  <span>{billTypeLabel(b)} · {dueText(b.nextDue)}</span>
                 </span>
                 <span className="list-amount">{money(b.amount)}</span>
               </button>

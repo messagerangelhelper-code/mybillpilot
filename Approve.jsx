@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "./icons.jsx";
-import { categoryLabel, money, dueText } from "./storage.js";
+import { billTypeLabel, money, dueText } from "./storage.js";
 
 const SCAMSHIELD_API = import.meta.env.VITE_SCAMSHIELD_API || "https://scamshield-api-ww2t.onrender.com";
 
@@ -48,7 +48,7 @@ export default function Approve({ bill, onBack, onPaid, onSnooze, onEdit }) {
 
       <section className="bill-card">
         <span className="bill-icon"><Icon name={bill.category} size={28} /></span>
-        <div className="muted">{bill.name.toLowerCase() === categoryLabel(bill.category).toLowerCase() ? bill.name : `${categoryLabel(bill.category)} · ${bill.name}`}</div>
+        <div className="muted">{bill.name.toLowerCase() === billTypeLabel(bill).toLowerCase() ? bill.name : `${billTypeLabel(bill)} · ${bill.name}`}</div>
         <div className="bill-amount">{money(bill.amount)}</div>
         <div className="due-text">{dueText(bill.nextDue)}</div>
         {host && <div className="muted small">Pays at {host}</div>}

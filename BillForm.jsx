@@ -1,10 +1,14 @@
 import { useState } from "react";
 import Icon from "./icons.jsx";
-import { CATEGORIES, todayISO } from "./storage.js";
+import { CATEGORIES, OTHER_TYPES, todayISO } from "./storage.js";
 
 export default function BillForm({ bill, onSave, onCancel, onDelete }) {
   const [form, setForm] = useState(
-    bill || { name: "", category: "electric", amount: "", frequency: "monthly", nextDue: todayISO(), payUrl: "" }
+    bill || { name: "", category: "electric", amount: "", frequency: "monthly", nextDue: todayISO(), payUrl: "", otherType: "" }
+  );
+  // "custom" = they're typing their own type instead of picking from the list.
+  const [otherChoice, setOtherChoice] = useState(
+    !bill?.otherType ? "" : OTHER_TYPES.includes(bill.otherType) ? bill.otherType : "custom"
   );
   const [error, setError] = useState("");
 
@@ -17,9 +21,13 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
     if (!form.name.trim()) return setError("Give the bill a name, like \"Electric\" or \"Netflix\".");
     if (!(Number(form.amount) > 0)) return setError("Enter the amount you usually pay.");
     if (!form.nextDue) return setError("Pick the next due date.");
+    const otherType = form.category === "other"
+      ? (otherChoice === "custom" ? (form.otherType || "").trim() : otherChoice)
+      : "";
+    if (form.category === "other" && !otherType) return setError("Pick what type of bill this is, or type your own.");
     let payUrl = form.payUrl.trim();
     if (payUrl && !/^https?:\/\//i.test(payUrl)) payUrl = "https://" + payUrl;
-    onSave({ ...form, name: form.name.trim(), amount: Number(form.amount), payUrl, snoozedUntil: null });
+    onSave({ ...form, name: form.name.trim(), amount: Number(form.amount), payUrl, otherType, snoozedUntil: null });
   }
 
   return (
@@ -40,6 +48,23 @@ export default function BillForm({ bill, onSave, onCancel, onDelete }) {
           {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
         </select>
       </label>
+
+      {form.category === "other" && (
+        <label className="field">
+          <span>Type of bill</span>
+          <select value={otherChoice} onChange={(e) => setOtherChoice(e.target.value)}>
+            <option value="">Choose a type…</option>
+            {OTHER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+            <option value="custom">Something else (type it)</option>
+          </select>
+        </label>
+      )}
+      {form.category === "other" && otherChoice === "custom" && (
+        <label className="field">
+          <span>Your bill type</span>
+          <input value={form.otherType || ""} onChange={(e) => set("otherType", e.target.value)} placeholder="e.g. Lawn care, Pet insurance" maxLength={30} />
+        </label>
+      )}
 
       <div className="two-col">
         <label className="field">

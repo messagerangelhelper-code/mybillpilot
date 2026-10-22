@@ -19,9 +19,22 @@ export const CATEGORIES = [
   { id: "other", label: "Other" },
 ];
 
+// Shown as a second dropdown when the category is "Other".
+export const OTHER_TYPES = [
+  "Phone", "Internet", "Cable / TV", "Trash", "Credit card",
+  "Student loan", "Personal loan", "Medical", "Childcare", "Gym / fitness",
+  "Taxes", "HOA fees", "Storage unit",
+];
+
 export function categoryLabel(id) {
   const c = CATEGORIES.find((x) => x.id === id);
   return c ? c.label : "Other";
+}
+
+// Category label for a bill, using its "Other" type when it has one.
+export function billTypeLabel(bill) {
+  if (bill.category === "other" && bill.otherType) return bill.otherType;
+  return categoryLabel(bill.category);
 }
 
 const EMPTY = { bills: [], payments: [], kids: [], premium: false };
