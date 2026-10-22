@@ -3,7 +3,7 @@ import {
   CATEGORIES, money, dueText, needsApproval, sameMonth, todayISO,
 } from "./storage.js";
 
-export default function Home({ data, onApprove, onAdd, onSeeAll }) {
+export default function Home({ data, onApprove, onAdd, onSeeAll, onPremium }) {
   const today = todayISO();
   const monthName = new Date().toLocaleDateString(undefined, { month: "long" });
 
@@ -27,7 +27,9 @@ export default function Home({ data, onApprove, onAdd, onSeeAll }) {
     <div className="stack">
       <header className="topbar">
         <div>
-          <div className="muted">Welcome back</div>
+          <button type="button" className={data.premium ? "plan-chip on" : "plan-chip"} onClick={onPremium}>
+            {data.premium ? "Premium" : "Free plan · Upgrade"}
+          </button>
           <div className="wordmark">MyBill<span>Pilot</span></div>
         </div>
         <button type="button" className="round-btn" aria-label="Add a bill" onClick={onAdd}>

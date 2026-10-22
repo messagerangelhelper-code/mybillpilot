@@ -7,6 +7,7 @@ import Approve from "./Approve.jsx";
 import Cards from "./Cards.jsx";
 import Kids from "./Kids.jsx";
 import Premium from "./Premium.jsx";
+import { checkPremium } from "./premium.js";
 import {
   loadData, saveData, newId, todayISO, addDays, nextDueAfterPayment,
   FREE_BILL_LIMIT, FREE_KID_LIMIT,
@@ -27,6 +28,22 @@ export default function App() {
   const [showPremium, setShowPremium] = useState(false);
 
   useEffect(() => saveData(data), [data]);
+
+  const [notice, setNotice] = useState("");
+
+  // Confirm a Premium purchase after Stripe checkout, and re-check it now and then.
+  useEffect(() => {
+    let cancelled = false;
+    checkPremium(data).then((changes) => {
+      if (cancelled || !changes) return;
+      const { justUpgraded, premiumError, ...rest } = changes;
+      if (premiumError) setNotice(premiumError);
+      if (Object.keys(rest).length) setData((d) => ({ ...d, ...rest }));
+      if (justUpgraded) setShowPremium(true);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ---------- bills ----------
   function startNewBill() {
@@ -113,7 +130,7 @@ export default function App() {
       />
     );
   } else if (tab === "home") {
-    screen = <Home data={data} onApprove={setApprovingId} onAdd={startNewBill} onSeeAll={() => setTab("bills")} />;
+    screen = <Home data={data} onApprove={setApprovingId} onAdd={startNewBill} onSeeAll={() => setTab("bills")} onPremium={() => setShowPremium(true)} />;
   } else if (tab === "bills") {
     screen = <Bills data={data} onOpen={setApprovingId} onAdd={startNewBill} />;
   } else if (tab === "cards") {
@@ -126,7 +143,15 @@ export default function App() {
 
   return (
     <div className="app">
-      <main className="screen">{screen}</main>
+      <main className="screen">
+        {notice && (
+          <div className="notice" role="status">
+            <span>{notice}</span>
+            <button type="button" className="link-btn" onClick={() => setNotice("")}>OK</button>
+          </div>
+        )}
+        {screen}
+      </main>
 
       {!fullScreen && (
         <nav className="tabbar" aria-label="Main">
@@ -148,6 +173,7 @@ export default function App() {
       {showPremium && (
         <Premium
           premium={data.premium}
+          plan={data.premiumPlan}
           onClose={() => setShowPremium(false)}
         />
       )}
